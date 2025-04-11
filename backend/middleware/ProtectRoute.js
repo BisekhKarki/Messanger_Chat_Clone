@@ -6,13 +6,17 @@ const express = require("express");
 const validateUser = async (req, res, next) => {
   try {
     const tokenValue = req.headers.authorization;
-    console.log(tokenValue);
+
     if (!tokenValue) {
       return res.redirect("/login");
     }
     const token = tokenValue.split(" ")[1];
 
     if (!token) {
+      return res.redirect("/login");
+    }
+    const verifyTOken = jwt.verify(token, process.env.JWT_SECRET);
+    if (!verifyTOken) {
       return res.redirect("/login");
     }
 

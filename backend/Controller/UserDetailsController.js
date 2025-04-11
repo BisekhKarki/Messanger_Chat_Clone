@@ -15,7 +15,7 @@ const getAllUser = async (req, res) => {
     }
 
     const filterUsers = await getUsers.filter(
-      (user) => user._id !== userData._id
+      (user) => user._id.toString() !== userData._id.toString()
     );
 
     if (!filterUsers) {

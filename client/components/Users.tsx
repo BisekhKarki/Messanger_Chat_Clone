@@ -5,6 +5,9 @@ import React, { useState } from "react";
 import UserSettingDropdown from "./UserSettingDropdown";
 import user from "@/public/User.jpg";
 import { User } from "@/types/Types";
+import { useRouter } from "next/navigation";
+import ContextHook from "@/context/ContextHook";
+import { fetchConversation } from "@/services/Conversation";
 
 interface UserProps {
   data: User[] | [];
@@ -12,6 +15,13 @@ interface UserProps {
 
 const Users: React.FC<UserProps> = ({ data }) => {
   const [isHoveredId, setIsHoveredId] = useState<string | undefined>("");
+  const router = useRouter();
+  const { token } = ContextHook();
+
+  const getConversation = async (id: string | undefined) => {
+    const response = await fetchConversation(id, token);
+    router.push(`/message/${response.data}`);
+  };
 
   return (
     <>
@@ -24,6 +34,7 @@ const Users: React.FC<UserProps> = ({ data }) => {
                 className="px-2 py-1"
                 onMouseEnter={() => setIsHoveredId(d._id)}
                 onMouseLeave={() => setIsHoveredId("")}
+                onClick={() => getConversation(d._id)}
               >
                 <div className="flex items-center justify-between px-2 hover:bg-gray-300  cursor-pointer  py-1">
                   <div className="flex items-center gap-2">

@@ -23,7 +23,7 @@ const registerUser = async (req, res) => {
       });
     }
 
-    const hashedPassword = await bcryptjs.hash(req.body.password, 10);
+    const hashedPassword = await bcryptjs.hash(password, 10);
     const newUser = new UserSchema({
       name,
       email,

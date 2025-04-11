@@ -17,7 +17,7 @@ const Page = () => {
     gender: "",
     password: "",
     phone: "",
-    image: null,
+    image: "",
   });
 
   const updateFormValues = (e: React.ChangeEvent<HTMLInputElement>) => {
