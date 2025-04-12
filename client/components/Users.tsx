@@ -57,7 +57,7 @@ const Users: React.FC<UserProps> = ({ data }) => {
                     )}
                     <div>
                       <p className="text-md font-bold">{d.name}</p>
-                      <p className="text-sm">Active{"2"}</p>
+                      {/* <p className="text-sm">Active{"2"}</p> */}
                     </div>
                   </div>
                   {d._id === isHoveredId && <UserSettingDropdown />}

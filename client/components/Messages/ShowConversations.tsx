@@ -1,33 +1,52 @@
 "use client";
 
-import ContextHook from "@/context/ContextHook";
-import { fetchMessages } from "@/services/Message";
 import { MessageProps } from "@/types/Types";
-import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
+import { socket } from "@/constants/baseurl";
 
 interface Props {
   receiverId: string;
+  messages: Array<MessageProps>;
+  setMessages: Dispatch<SetStateAction<MessageProps[]>>;
 }
 
-const ShowConversations: React.FC<Props> = ({ receiverId }) => {
-  const { token } = ContextHook();
-  const params = useParams();
-  const [messages, setMessages] = useState<Array<MessageProps> | []>([]);
-
-  const getMessages = async () => {
-    const response = await fetchMessages(token, params.id as string);
-    setMessages(response.message);
-  };
+const ShowConversations: React.FC<Props> = ({
+  receiverId,
+  messages,
+  setMessages,
+}) => {
+  const [lastMessage, setLastMessage] = useState<MessageProps | null>(null);
 
   useEffect(() => {
-    getMessages();
-  }, []);
+    setLastMessage(messages.at(-1) || null);
+  }, [messages]);
+
+  useEffect(() => {
+    if (messages && messages.length > 0) {
+      if (
+        lastMessage &&
+        !lastMessage.read &&
+        lastMessage?.receiverId === receiverId
+      )
+        socket.emit("message_read", lastMessage._id);
+      socket.on("read_message", (data) => {
+        setMessages((prev: MessageProps[]) =>
+          prev.map((m) => (m._id === data._id ? data : m))
+        );
+      });
+    }
+
+    return () => {
+      socket.off("read_message");
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, setMessages]);
 
   return (
     <div className="h-[70vh] overflow-y-auto">
-      <div className="flex overflow-y-auto flex-col gap-2 mt-5">
+      <div className="flex overflow-y-auto flex-col gap-2 mt-5 mb-8">
         {messages &&
           messages.length > 0 &&
           messages.map((m, k) => (
@@ -42,19 +61,34 @@ const ShowConversations: React.FC<Props> = ({ receiverId }) => {
               {m.message}
             </p>
           ))}
-        <span
-          className={`${
-            messages.at(-1)?.receiverId !== receiverId
-              ? "self-start ml-6 text-gray-400  -mt-2"
-              : "self-end text-sm mr-6 text-gray-400 -mt-2"
-          }`}
-        >
-          {messages &&
-            messages.length > 0 &&
-            formatDistanceToNow(new Date(messages.at(-1)?.createdAt || ""), {
-              addSuffix: true,
-            })}
-        </span>
+
+        {lastMessage && lastMessage.senderId !== receiverId && (
+          <span
+            className={`${
+              messages.at(-1)?.receiverId !== receiverId
+                ? "self-start ml-6 text-gray-400  -mt-2"
+                : "self-end text-sm mr-6 text-gray-400 -mt-2"
+            }`}
+          >
+            <span className="mr-1">
+              {lastMessage.receiverId === receiverId && lastMessage.read
+                ? "Seen"
+                : "Sent"}
+            </span>
+            {messages &&
+              messages.length > 0 &&
+              formatDistanceToNow(
+                new Date(
+                  (lastMessage.read
+                    ? messages.at(-1)?.updatedAt
+                    : messages.at(-1)?.createdAt) || ""
+                ),
+                {
+                  addSuffix: true,
+                }
+              )}
+          </span>
+        )}
       </div>
     </div>
   );

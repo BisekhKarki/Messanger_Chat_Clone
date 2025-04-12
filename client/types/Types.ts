@@ -38,6 +38,7 @@ export interface conversationProps {
 }
 
 export interface MessageProps {
+  _id?: string;
   conversationId: string | undefined;
   receiverId?: string | undefined;
   senderId?: string | undefined;
@@ -50,4 +51,15 @@ export interface MessageProps {
 export interface MessageGetProps {
   success: boolean;
   message: Array<MessageProps>;
+}
+
+export interface DecodeUserProps {
+  _id: string;
+  name: string;
+  email: string;
+  password: string;
+  date_of_birth: string;
+  phone: string;
+  image?: string; // optional
+  gender: "Male" | "Female" | "Others";
 }

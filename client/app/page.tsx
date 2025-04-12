@@ -14,6 +14,7 @@ export default function Home() {
 
   useEffect(() => {
     checkToken();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   return (

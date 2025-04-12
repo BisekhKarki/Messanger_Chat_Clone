@@ -1,47 +1,92 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-
-import UserInfo from "@/components/UserInfo";
-import ContextHook from "@/context/ContextHook";
 import { IoSend } from "react-icons/io5";
 import UserMessageDisplay from "./Messages/UserMessageDisplay";
-import { fetchUserDetails } from "@/services/Conversation";
-import { useParams } from "next/navigation";
-import { User } from "@/types/Types";
-import { sendMessage } from "@/services/Message";
-import toast from "react-hot-toast";
 import ShowConversations from "./Messages/ShowConversations";
+import { fetchUserDetails } from "@/services/Conversation";
+import { fetchMessages } from "@/services/Message";
+import { getSingleUser } from "@/services/singleUser";
+import ContextHook from "@/context/ContextHook";
+import toast from "react-hot-toast";
+import { socket } from "@/constants/baseurl";
+import { useParams } from "next/navigation";
+import { User, MessageProps } from "@/types/Types";
+import UserInfo from "./UserInfo";
 
 const DisplayMessage = () => {
   const { showInfo, token } = ContextHook();
   const params = useParams();
   const [user, setUser] = useState<User | null>(null);
   const [userMessage, setUserMessage] = useState<string>("");
+  const [senderId, setSenderId] = useState<User | null>(null);
+  const [date, setDate] = useState<Date | null>(null);
 
+  // Fetch user and sender details
   const details = async () => {
     const response = await fetchUserDetails(token, params.id as string);
     if (response.success) {
       setUser(response.message);
     }
+    const getUser = await getSingleUser(token);
+    if (getUser?.success) {
+      setSenderId(getUser.message);
+    }
   };
 
   useEffect(() => {
+    const newDate = new Date();
+    setDate(newDate); // Set date only on client side
     details();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Send message to user
   const sendMessageToUser = async () => {
     if (!user) return;
-    if (userMessage.length === 0) toast.error("Enter a message");
-    const values = {
-      conversationId: params.id as string,
-      receiverId: user._id as string,
+    if (userMessage.trim().length === 0) {
+      toast.error("Enter a message");
+      return;
+    }
+
+    const data = {
+      conversationId: params.id,
+      senderId: senderId?._id,
+      receiverId: user?._id,
       message: userMessage,
+      createdAt: date,
+      updatedAt: date,
+      read: false,
     };
-    const response = await sendMessage(token, values);
-    toast.success(response?.message as string);
-    setUserMessage("");
+
+    // Emit message via socket
+    socket.emit("send_message", data);
+    setUserMessage(""); // Clear the input field
   };
+
+  const [messages, setMessages] = useState<Array<MessageProps> | []>([]);
+
+  // Listen for incoming messages
+  useEffect(() => {
+    socket.on("receive_message", (data) => {
+      setMessages((prev) => [...prev, data]);
+    });
+
+    return () => {
+      socket.off("receive_message"); // Clean up on component unmount
+    };
+  }, []);
+
+  // Fetch previous messages for the conversation
+  const getMessages = async () => {
+    const response = await fetchMessages(token, params.id as string);
+    setMessages(response.message);
+  };
+
+  useEffect(() => {
+    getMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="w-full">
@@ -54,7 +99,13 @@ const DisplayMessage = () => {
           }`}
         >
           <UserMessageDisplay userDetails={user} />
-          <ShowConversations receiverId={user?._id as string} />
+          <div className="overflow-y-auto">
+            <ShowConversations
+              messages={messages}
+              receiverId={user?._id as string}
+              setMessages={setMessages}
+            />
+          </div>
           <div className="p-2 border-t border-gray-300  relative">
             <input
               type="text"

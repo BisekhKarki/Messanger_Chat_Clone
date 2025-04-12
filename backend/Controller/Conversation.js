@@ -70,7 +70,33 @@ const getUserDetails = async (req, res) => {
   }
 };
 
+const deleteConversation = async (req, res) => {
+  const { conversationId } = req.body;
+  try {
+    const findConversation = await conversation.findByIdAndDelete(
+      conversationId
+    );
+    if (!findConversation) {
+      return res.status(400).json({
+        success: false,
+        message: "Conversation not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Conversation deleted",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createConversation,
   getUserDetails,
+  deleteConversation,
 };
