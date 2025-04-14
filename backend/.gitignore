@@ -1,8 +1,7 @@
-# env files (can opt-in for committing if needed)
-.env/
-# dependencies
+# Environment
+.env
+.env.*
+!.env.example
+
+# Dependencies
 node_modules/
-
-
-
-
