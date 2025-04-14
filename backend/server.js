@@ -14,14 +14,14 @@ const PORT = process.env.PORT || 5000;
 
 // Server for the socket
 // const socketIo = require("socket.io");
-const frontendUrl = "http://localhost:3000" || process.env.FRONTENDURL;
 
 const { Server } = require("socket.io");
 const http = require("http");
 const server = http.createServer(app);
+
 const io = new Server(server, {
   cors: {
-    origin: frontendUrl,
+    origin: [process.env.FRONTENDURL, "http://localhost:3000"],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   },
@@ -31,7 +31,7 @@ const io = new Server(server, {
 app.use(express.json());
 app.use(
   cors({
-    origin: frontendUrl,
+    origin: [process.env.FRONTENDURL, "http://localhost:3000"],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
@@ -69,7 +69,7 @@ io.on("connection", (so) => {
     io.emit("read_message", newData);
   });
 
-  so.on("disconnect", () => {
-    console.log("user disconnected", so.id);
-  });
+  // so.on("disconnect", () => {
+  //   console.log("user disconnected", so.id);
+  // });
 });

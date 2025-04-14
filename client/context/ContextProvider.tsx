@@ -25,7 +25,7 @@ const ContextProvider = ({ children }: Props) => {
   const router = useRouter();
 
   const checkToken = () => {
-    if (typeof window === "undefined") return;
+    // if (typeof window === "undefined") return;
     const getLocalStorage = localStorage.getItem("Token");
 
     if (!getLocalStorage) {
@@ -50,9 +50,7 @@ const ContextProvider = ({ children }: Props) => {
     setToken,
   };
 
-  return token ? (
-    <Context.Provider value={value}>{children}</Context.Provider>
-  ) : null;
+  return <Context.Provider value={value}>{children}</Context.Provider>;
 };
 
 export default ContextProvider;

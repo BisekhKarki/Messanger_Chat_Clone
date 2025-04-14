@@ -19,6 +19,7 @@ const Users: React.FC<UserProps> = ({ data }) => {
   const { token } = ContextHook();
 
   const getConversation = async (id: string | undefined) => {
+    if (!token) return;
     const response = await fetchConversation(id, token);
     router.push(`/message/${response.data}`);
   };

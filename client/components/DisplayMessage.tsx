@@ -22,8 +22,11 @@ const DisplayMessage = () => {
   const [senderId, setSenderId] = useState<User | null>(null);
   const [date, setDate] = useState<Date | null>(null);
 
+  const [messages, setMessages] = useState<Array<MessageProps> | []>([]);
+
   // Fetch user and sender details
   const details = async () => {
+    if (!token) return;
     const response = await fetchUserDetails(token, params.id as string);
     if (response.success) {
       setUser(response.message);
@@ -64,8 +67,6 @@ const DisplayMessage = () => {
     setUserMessage(""); // Clear the input field
   };
 
-  const [messages, setMessages] = useState<Array<MessageProps> | []>([]);
-
   // Listen for incoming messages
   useEffect(() => {
     socket.on("receive_message", (data) => {
@@ -79,6 +80,7 @@ const DisplayMessage = () => {
 
   // Fetch previous messages for the conversation
   const getMessages = async () => {
+    if (!token) return;
     const response = await fetchMessages(token, params.id as string);
     setMessages(response.message);
   };

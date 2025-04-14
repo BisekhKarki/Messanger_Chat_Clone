@@ -11,6 +11,7 @@ const AllUser = () => {
   const [users, setUsers] = useState<User[]>([]);
 
   const fetchDetails = async () => {
+    if (!token) return;
     const response = await user.get(token);
     if (response?.success) {
       setUsers(response.message);

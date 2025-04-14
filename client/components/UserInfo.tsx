@@ -17,6 +17,7 @@ const UserInfo = ({ userDetails }: UserInfroProps) => {
   const router = useRouter();
 
   const deleteConversation = async () => {
+    if (!token) return;
     const response = await deleteConvo(token, params.id as string);
     if (response?.success) {
       router.push("/");

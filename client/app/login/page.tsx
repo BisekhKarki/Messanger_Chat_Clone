@@ -48,7 +48,7 @@ const Page = () => {
       <div className="flex justify-center py-20">
         <div className="border border-gray-300 px-10 bg-white py-10 shadow-lg rounded-lg">
           <h1 className="text-center font-bold text-3xl">Login to chatlify</h1>
-          <form action="" className="space-y-4 mt-5" onSubmit={handleSubmit}>
+          <form className="space-y-4 mt-5" onSubmit={handleSubmit}>
             <input
               type="email"
               name="email"
