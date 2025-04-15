@@ -16,11 +16,7 @@ const PORT = process.env.PORT || 4000;
 // const socketIo = require("socket.io");
 
 const corsOptions = {
-  origin: [
-    process.env.FRONTEND_URL,
-    "http://localhost:3000",
-    // Add any other allowed origins here
-  ],
+  origin: [String(process.env.FRONTENDURL), "http://localhost:3000"],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   credentials: true,
 };
@@ -30,13 +26,7 @@ const http = require("http");
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  origin: [
-    process.env.FRONTEND_URL,
-    "http://localhost:3000",
-    // Add any other allowed origins here
-  ],
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-  credentials: true,
+  cors: corsOptions,
   transports: ["websocket", "polling"],
 });
 
