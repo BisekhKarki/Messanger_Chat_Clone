@@ -10,7 +10,7 @@ const messageRouter = require("./router/MessageRouter");
 const messageSchema = require("./Schema/Message");
 const dotenv = require("dotenv");
 dotenv.config();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4000;
 
 // Server for the socket
 // const socketIo = require("socket.io");
@@ -30,7 +30,14 @@ const http = require("http");
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: corsOptions,
+  origin: [
+    process.env.FRONTEND_URL,
+    "http://localhost:3000",
+    // Add any other allowed origins here
+  ],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  credentials: true,
+  transports: ["websocket", "polling"],
 });
 
 // App server
@@ -49,7 +56,7 @@ app.use("/api/conversation", conversation);
 // For message
 app.use("/api/message", messageRouter);
 
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port: ${PORT}`);
 });
 
