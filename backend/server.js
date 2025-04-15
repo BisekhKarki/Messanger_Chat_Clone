@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 4000;
 // const socketIo = require("socket.io");
 
 const corsOptions = {
-  origin: [String(process.env.FRONTENDURL), "http://localhost:3000"],
+  origin: [String(process.env.FRONTEND_URL), "http://localhost:3000"],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   credentials: true,
 };
