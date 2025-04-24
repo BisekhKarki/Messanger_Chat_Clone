@@ -2,6 +2,7 @@ export interface userapi {
   success: boolean;
   message: string;
   token?: string;
+  newConversation?: MessageProps;
 }
 
 export interface User {
@@ -46,6 +47,7 @@ export interface MessageProps {
   read?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  messageType?: string;
 }
 
 export interface MessageGetProps {
@@ -62,4 +64,13 @@ export interface DecodeUserProps {
   phone: string;
   image?: string; // optional
   gender: "Male" | "Female" | "Others";
+}
+
+export interface UploadedFile {
+  lastModified: number;
+  lastModifiedDate: Date;
+  name: string;
+  size: number;
+  type: string;
+  webkitRelativePath: string;
 }

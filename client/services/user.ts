@@ -13,6 +13,7 @@ const user = {
       });
 
       const data = await response.json();
+      console.log(response);
       return data as UserFetchProps;
     } catch (error: unknown) {
       console.log(error);

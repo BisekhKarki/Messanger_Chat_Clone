@@ -44,3 +44,20 @@ export const fetchMessages = async (
     console.log(String(error));
   }
 };
+
+export const sendImages = async (token: string, data: FormData) => {
+  try {
+    const response = await fetch(`${baseUrl}api/images/send`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+
+      body: data,
+    });
+    const value = await response.json();
+    return value as userapi;
+  } catch (error: unknown) {
+    console.log(String(error));
+  }
+};

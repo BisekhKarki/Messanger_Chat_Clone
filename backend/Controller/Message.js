@@ -54,7 +54,50 @@ const getAllMessage = async (req, res) => {
   }
 };
 
+const sendImages = async (req, res) => {
+  // console.log(req.body);
+  const { conversationId, receiverId } = req.body;
+  const userData = req.userData;
+
+  try {
+    const findConversation = await conversation.findById(conversationId);
+
+    if (!findConversation) {
+      return res.status(400).json({
+        success: false,
+        message: "Conversation do not exists",
+      });
+    }
+
+    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${
+      req.file.filename
+    }`;
+
+    const newMessage = new messageSchema({
+      conversationId: conversationId,
+      senderId: userData._id,
+      receiverId: receiverId,
+      message: imageUrl,
+      messageType: "Image",
+    });
+
+    await newMessage.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Sent",
+      newConversation: newMessage,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   sendMessage,
   getAllMessage,
+  sendImages,
 };

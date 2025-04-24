@@ -5,6 +5,8 @@ import { MessageProps } from "@/types/Types";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { socket } from "@/constants/baseurl";
+import Image from "next/image";
+import ShowImageFull from "./ShowImageFull";
 
 interface Props {
   receiverId: string;
@@ -18,6 +20,8 @@ const ShowConversations: React.FC<Props> = ({
   setMessages,
 }) => {
   const [lastMessage, setLastMessage] = useState<MessageProps | null>(null);
+  const [showFullImage, setShowFullImage] = useState<boolean>(false);
+  const [imageUrl, setImageUrl] = useState<string>("");
 
   useEffect(() => {
     setLastMessage(messages.at(-1) || null);
@@ -45,22 +49,58 @@ const ShowConversations: React.FC<Props> = ({
   }, [messages, setMessages]);
 
   return (
-    <div className="h-[70vh] overflow-y-auto">
+    <div className="h-[70vh] overflow-y-auto ">
       <div className="flex overflow-y-auto flex-col gap-2 mt-5 mb-8">
+        <div className="">
+          <div
+            className={`fixed inset-0 z-50 transition-all duration-200 ease-in-out ${
+              showFullImage
+                ? " opacity-100 visible backdrop-blur-sm "
+                : "opacity-0 invisible"
+            }`}
+          >
+            {showFullImage && imageUrl && (
+              <ShowImageFull
+                imageSrc={imageUrl}
+                setShowFullImage={setShowFullImage}
+              />
+            )}
+          </div>
+        </div>
+
         {messages &&
           messages.length > 0 &&
-          messages.map((m, k) => (
-            <p
-              className={`${
-                m.receiverId !== receiverId
-                  ? "bg-gray-200 text-black self-start text-left ml-4 rounded-2xl shadow-sm  cursor-pointer"
-                  : "bg-blue-500 text-white self-end text-right mr-4 rounded-2xl shadow-sm cursor-pointer"
-              } max-w-[60%] py-2   px-5`}
-              key={k}
-            >
-              {m.message}
-            </p>
-          ))}
+          messages.map((m, k) =>
+            m.messageType === "Image" ? (
+              <Image
+                src={m.message as string}
+                width={300}
+                height={300}
+                unoptimized
+                className={`${
+                  m.receiverId !== receiverId ? " self-start " : " self-end "
+                } max-w-[60%] py-2 cursor-pointer  px-5`}
+                key={k}
+                alt="image"
+                onClick={() => {
+                  console.log(m.message);
+                  setImageUrl(m.message as string);
+                  setShowFullImage(true);
+                }}
+              />
+            ) : (
+              <p
+                className={`${
+                  m.receiverId !== receiverId && m.messageType !== "Image"
+                    ? "bg-gray-200 text-black self-start text-left ml-4 rounded-2xl shadow-sm  cursor-pointer"
+                    : "bg-blue-500 text-white self-end text-right mr-4 rounded-2xl shadow-sm cursor-pointer"
+                } max-w-[60%] py-2   px-5`}
+                key={k}
+              >
+                {m.message}
+              </p>
+            )
+          )}
 
         {lastMessage && lastMessage.senderId !== receiverId && (
           <span

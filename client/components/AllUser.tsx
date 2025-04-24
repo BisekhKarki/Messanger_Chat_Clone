@@ -2,12 +2,17 @@
 
 import React, { useEffect, useState } from "react";
 import Users from "./Users";
-import ContextHook from "@/context/ContextHook";
+// import  from "@/context/ContextHook";
 import { User } from "@/types/Types";
 import user from "@/services/user";
+import useCustomContext from "@/context/ContextHook";
 
-const AllUser = () => {
-  const { token } = ContextHook();
+interface Props {
+  searchValue: string;
+}
+
+const AllUser = ({ searchValue }: Props) => {
+  const { token } = useCustomContext();
   const [users, setUsers] = useState<User[]>([]);
 
   const fetchDetails = async () => {
@@ -26,7 +31,7 @@ const AllUser = () => {
   return (
     <div>
       {users && users.length > 0 ? (
-        <Users data={users} />
+        <Users data={users} searchValue={searchValue} />
       ) : (
         <p>No Users found</p>
       )}

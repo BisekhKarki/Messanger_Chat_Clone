@@ -7,20 +7,23 @@ import ShowConversations from "./Messages/ShowConversations";
 import { fetchUserDetails } from "@/services/Conversation";
 import { fetchMessages } from "@/services/Message";
 import { getSingleUser } from "@/services/singleUser";
-import ContextHook from "@/context/ContextHook";
+import useCustomContext from "@/context/ContextHook";
 import toast from "react-hot-toast";
 import { socket } from "@/constants/baseurl";
 import { useParams } from "next/navigation";
 import { User, MessageProps } from "@/types/Types";
 import UserInfo from "./UserInfo";
+import { FaFileImage } from "react-icons/fa";
+import ImageInput from "./ImageInput";
 
 const DisplayMessage = () => {
-  const { showInfo, token } = ContextHook();
+  const { showInfo, token } = useCustomContext();
   const params = useParams();
   const [user, setUser] = useState<User | null>(null);
   const [userMessage, setUserMessage] = useState<string>("");
   const [senderId, setSenderId] = useState<User | null>(null);
   const [date, setDate] = useState<Date | null>(null);
+  const [uploadImage, setUploadImage] = useState<boolean>(false);
 
   const [messages, setMessages] = useState<Array<MessageProps> | []>([]);
 
@@ -92,15 +95,18 @@ const DisplayMessage = () => {
 
   return (
     <div className="w-full">
-      <div className="flex w-full ">
+      <div className="flex w-full relative ">
         <div
           className={`${
             showInfo
-              ? "w-[75%] border-r-1  border-gray-300 h-[90vh]"
+              ? "max-2xl:w-[75%] max-xl:w-[73%] max-lg:w-[65%] max-md:w-[68%] max-sm:w-[100%] relative  border-r-1  border-gray-300 h-[90vh] "
               : "w-[100%]"
           }`}
         >
-          <UserMessageDisplay userDetails={user} />
+          <UserMessageDisplay
+            userDetails={user}
+            // senderId={senderId?._id as string}
+          />
           <div className="overflow-y-auto">
             <ShowConversations
               messages={messages}
@@ -108,7 +114,7 @@ const DisplayMessage = () => {
               setMessages={setMessages}
             />
           </div>
-          <div className="p-2 border-t border-gray-300  relative">
+          <div className="p-2 border-t border-gray-300 flex items-center space-x-5">
             <input
               type="text"
               placeholder="Type a message..."
@@ -118,10 +124,25 @@ const DisplayMessage = () => {
                 setUserMessage(e.target.value)
               }
             />
-            <IoSend
-              className="absolute top-5 right-4 text-2xl text-blue-600"
-              onClick={() => sendMessageToUser()}
-            />
+            {uploadImage && (
+              <ImageInput
+                setUploadImage={setUploadImage}
+                token={token}
+                receiver={user?._id}
+                setMessage={setMessages}
+              />
+            )}
+            <div className="flex space-x-5 mr-2">
+              <FaFileImage
+                onClick={() => setUploadImage(true)}
+                className=" text-2xl text-blue-600"
+              />
+
+              <IoSend
+                className=" text-2xl text-blue-600"
+                onClick={() => sendMessageToUser()}
+              />
+            </div>
           </div>
         </div>
         {showInfo && <UserInfo userDetails={user} />}

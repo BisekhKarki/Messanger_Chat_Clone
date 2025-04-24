@@ -10,6 +10,7 @@ const loginUser = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
+        credentials: "include",
       });
       const val = await response.json();
       return val as userapi;

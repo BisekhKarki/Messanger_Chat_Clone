@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Context } from "./ContextProvider";
 
-const ContextHook = () => {
+const useCustomContext = () => {
   const contextValue = useContext(Context);
 
   if (!contextValue) {
@@ -11,4 +11,4 @@ const ContextHook = () => {
   return contextValue;
 };
 
-export default ContextHook;
+export default useCustomContext;

@@ -7,17 +7,23 @@ const userRouter = require("./router/UserRouter");
 const userDetails = require("./router/UserDetailsRouter");
 const conversation = require("./router/ConversationRouter");
 const messageRouter = require("./router/MessageRouter");
+const imageRouter = require("./router/ImageRouter");
 const messageSchema = require("./Schema/Message");
+const callRouter = require("./router/CallRouter");
 const dotenv = require("dotenv");
 dotenv.config();
 const PORT = process.env.PORT || 4000;
+const path = require("path");
 
 // Server for the socket
 // const socketIo = require("socket.io");
 
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+
 const corsOptions = {
-  origin: [String(process.env.FRONTEND_URL), "http://localhost:3000"],
+  origin: FRONTEND_URL,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 };
 
@@ -34,6 +40,14 @@ const io = new Server(server, {
 app.use(express.json());
 app.use(cors(corsOptions));
 
+// For Uploaded Images
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// app.use((req, res, next) => {
+//   console.log("Incoming Origin:", req.headers.origin);
+//   next();
+// });
+
 // Database connection
 database();
 
@@ -45,6 +59,10 @@ app.use("/api/get", userDetails);
 app.use("/api/conversation", conversation);
 // For message
 app.use("/api/message", messageRouter);
+// For sending Images
+app.use("/api/images", imageRouter);
+// For calling
+app.use("/api/call", callRouter);
 
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port: ${PORT}`);
