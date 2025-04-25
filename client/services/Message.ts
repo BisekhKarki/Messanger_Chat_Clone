@@ -61,3 +61,42 @@ export const sendImages = async (token: string, data: FormData) => {
     console.log(String(error));
   }
 };
+
+export const deleteMessage = async (token: string, id: string) => {
+  try {
+    const response = await fetch(`${baseUrl}api/message/delete/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    const value = await response.json();
+    return value as userapi;
+  } catch (error: unknown) {
+    console.log(String(error));
+  }
+};
+
+export const editMessage = async (
+  token: string,
+  id: string,
+  message: string
+) => {
+  try {
+    const response = await fetch(`${baseUrl}api/message/edit/${id}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: message,
+      }),
+    });
+    const value = await response.json();
+    return value as userapi;
+  } catch (error: unknown) {
+    console.log(String(error));
+  }
+};

@@ -12,8 +12,9 @@ const messageSchema = require("./Schema/Message");
 const callRouter = require("./router/CallRouter");
 const dotenv = require("dotenv");
 dotenv.config();
+// const fs = require("fs");
 const PORT = process.env.PORT || 4000;
-const path = require("path");
+// const path = require("path");
 
 // Server for the socket
 // const socketIo = require("socket.io");
@@ -37,11 +38,17 @@ const io = new Server(server, {
 });
 
 // App server
+
 app.use(express.json());
 app.use(cors(corsOptions));
 
 // For Uploaded Images
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// const uploadDir = path.join(__dirname, "uploads");
+// if (!fs.existsSync(uploadDir)) {
+//   fs.mkdirSync(uploadDir, { recursive: true });
+// }
+// app.set("trust proxy", 1);
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // app.use((req, res, next) => {
 //   console.log("Incoming Origin:", req.headers.origin);

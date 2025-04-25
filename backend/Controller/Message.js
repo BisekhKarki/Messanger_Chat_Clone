@@ -1,5 +1,6 @@
 const messageSchema = require("../Schema/Message");
 const conversation = require("../Schema/Conversation");
+const cloudinary = require("cloudinary").v2;
 
 const sendMessage = async (req, res) => {
   const { conversationId, receiverId, message } = req.body;
@@ -68,16 +69,36 @@ const sendImages = async (req, res) => {
         message: "Conversation do not exists",
       });
     }
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No image provided",
+      });
+    }
 
-    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${
-      req.file.filename
-    }`;
+    // const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${
+    //   req.file.filename
+    // }`;
+
+    const result = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: "chat-images",
+          resource_type: "auto",
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      uploadStream.end(req.file.buffer);
+    });
 
     const newMessage = new messageSchema({
       conversationId: conversationId,
       senderId: userData._id,
       receiverId: receiverId,
-      message: imageUrl,
+      message: result.secure_url,
       messageType: "Image",
     });
 
@@ -96,8 +117,61 @@ const sendImages = async (req, res) => {
   }
 };
 
+const deleteMessage = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const message = await messageSchema.findByIdAndDelete(id);
+    if (!message) {
+      return res.status(400).json({
+        success: false,
+        message: "No message found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Message Deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const editMessage = async (req, res) => {
+  const { id } = req.params;
+  const { message } = req.body;
+
+  try {
+    const messageGet = await messageSchema.findByIdAndUpdate(id, {
+      message: message,
+    });
+    if (!messageGet) {
+      return res.status(400).json({
+        success: false,
+        message: "No message found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Message Updated successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   sendMessage,
   getAllMessage,
   sendImages,
+  deleteMessage,
+  editMessage,
 };

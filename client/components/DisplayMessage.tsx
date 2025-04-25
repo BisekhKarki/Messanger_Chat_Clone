@@ -5,7 +5,7 @@ import { IoSend } from "react-icons/io5";
 import UserMessageDisplay from "./Messages/UserMessageDisplay";
 import ShowConversations from "./Messages/ShowConversations";
 import { fetchUserDetails } from "@/services/Conversation";
-import { fetchMessages } from "@/services/Message";
+import { editMessage, fetchMessages } from "@/services/Message";
 import { getSingleUser } from "@/services/singleUser";
 import useCustomContext from "@/context/ContextHook";
 import toast from "react-hot-toast";
@@ -15,6 +15,7 @@ import { User, MessageProps } from "@/types/Types";
 import UserInfo from "./UserInfo";
 import { FaFileImage } from "react-icons/fa";
 import ImageInput from "./ImageInput";
+import { BsSendPlusFill } from "react-icons/bs";
 
 const DisplayMessage = () => {
   const { showInfo, token } = useCustomContext();
@@ -24,6 +25,8 @@ const DisplayMessage = () => {
   const [senderId, setSenderId] = useState<User | null>(null);
   const [date, setDate] = useState<Date | null>(null);
   const [uploadImage, setUploadImage] = useState<boolean>(false);
+  const [editMessageId, setEditMessageId] = useState<string>("");
+  const [edit, setEdit] = useState(false);
 
   const [messages, setMessages] = useState<Array<MessageProps> | []>([]);
 
@@ -90,8 +93,25 @@ const DisplayMessage = () => {
 
   useEffect(() => {
     getMessages();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const editUserMessage = async () => {
+    const response = await editMessage(token, editMessageId, userMessage);
+    if (response?.success) {
+      setUserMessage("");
+      setEdit(false);
+      const newMessage = messages.map((p) =>
+        p._id === editMessageId
+          ? { ...p, message: userMessage, updatedAt: new Date() }
+          : p
+      );
+
+      setMessages(newMessage);
+      toast.success(response.message);
+    }
+  };
 
   return (
     <div className="w-full">
@@ -109,9 +129,12 @@ const DisplayMessage = () => {
           />
           <div className="overflow-y-auto">
             <ShowConversations
+              setUserMessage={setUserMessage}
               messages={messages}
               receiverId={user?._id as string}
               setMessages={setMessages}
+              setEditMessageId={setEditMessageId}
+              setEdit={setEdit}
             />
           </div>
           <div className="p-2 border-t border-gray-300 flex items-center space-x-5">
@@ -138,10 +161,17 @@ const DisplayMessage = () => {
                 className=" text-2xl text-blue-600"
               />
 
-              <IoSend
-                className=" text-2xl text-blue-600"
-                onClick={() => sendMessageToUser()}
-              />
+              {edit ? (
+                <BsSendPlusFill
+                  className=" text-2xl text-blue-600"
+                  onClick={() => editUserMessage()}
+                />
+              ) : (
+                <IoSend
+                  className=" text-2xl text-blue-600"
+                  onClick={() => sendMessageToUser()}
+                />
+              )}
             </div>
           </div>
         </div>
