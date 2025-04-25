@@ -11,7 +11,6 @@ import user from "@/public/User.jpg";
 import { User } from "@/types/Types";
 
 import CallPopup from "../Call/CallPopup";
-import IncommingCallListener from "../Call/IncommingCallListener";
 
 interface userDetailsProps {
   userDetails: User | null;
@@ -42,12 +41,6 @@ const UserMessageDisplay = ({ userDetails }: userDetailsProps) => {
         </div>
       </div>
       <div className="flex gap-3 mr-5 items-center">
-        {userDetails && (
-          <IncommingCallListener
-            userId={userDetails._id as string}
-            // senderId={senderId as string}
-          />
-        )}
         {showPop && (
           <CallPopup id={userDetails?._id as string} setShowPop={setShowPop} />
         )}
