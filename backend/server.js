@@ -9,7 +9,6 @@ const conversation = require("./router/ConversationRouter");
 const messageRouter = require("./router/MessageRouter");
 const imageRouter = require("./router/ImageRouter");
 const messageSchema = require("./Schema/Message");
-const callRouter = require("./router/CallRouter");
 const dotenv = require("dotenv");
 dotenv.config();
 // const fs = require("fs");
@@ -69,7 +68,6 @@ app.use("/api/message", messageRouter);
 // For sending Images
 app.use("/api/images", imageRouter);
 // For calling
-app.use("/api/call", callRouter);
 
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port: ${PORT}`);
