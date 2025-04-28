@@ -5,6 +5,11 @@ export interface userapi {
   newConversation?: MessageProps;
 }
 
+export interface messageApi {
+  success: boolean;
+  message: MessageProps[];
+}
+
 export interface User {
   _id?: string;
   name: string;

@@ -168,10 +168,42 @@ const editMessage = async (req, res) => {
   }
 };
 
+const lastMessage = async (req, res) => {
+  const userData = req.userData;
+  const { otherUser } = req.body;
+  try {
+    const conversations = await conversation.findOne({
+      users: [userData._id, otherUser],
+    });
+
+    if (conversations) {
+      const messages = await messageSchema.find({
+        conversationId: conversations._id,
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: messages,
+      });
+    } else {
+      return res.status(200).json({
+        success: true,
+        message: [],
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   sendMessage,
   getAllMessage,
   sendImages,
   deleteMessage,
   editMessage,
+  lastMessage,
 };

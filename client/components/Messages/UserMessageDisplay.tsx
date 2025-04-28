@@ -14,6 +14,7 @@ import CallPopup from "../Call/CallPopup";
 
 interface userDetailsProps {
   userDetails: User | null;
+
   // senderId: string;
 }
 

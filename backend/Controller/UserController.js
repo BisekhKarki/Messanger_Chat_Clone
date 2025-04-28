@@ -95,7 +95,32 @@ const loginUser = async (req, res) => {
   }
 };
 
+const getUser = async (req, res) => {
+  const userData = req.userData;
+  try {
+    const findUser = await UserSchema.findById(userData._id).select(
+      "-password"
+    );
+    if (!findUser) {
+      return res.status(404).json({
+        success: false,
+        message: "Invalid User",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: findUser,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  getUser,
 };

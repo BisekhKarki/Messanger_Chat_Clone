@@ -8,6 +8,7 @@ import { User } from "@/types/Types";
 import { useRouter } from "next/navigation";
 import useCustomContext from "@/context/ContextHook";
 import { fetchConversation } from "@/services/Conversation";
+import LastMessage from "./Messages/LastMessage";
 
 interface UserProps {
   data: User[] | [];
@@ -62,8 +63,9 @@ const Users: React.FC<UserProps> = ({ data, searchValue }) => {
                         />
                       )}
                       <div>
-                        <p className="text-md font-bold">{d.name}</p>
+                        <p className="text-md text-gray-600">{d.name}</p>
                         {/* <p className="text-sm">Active{"2"}</p> */}
+                        <LastMessage id={d._id as string} />
                       </div>
                     </div>
                     {/* {d._id === isHoveredId && <UserSettingDropdown />} */}

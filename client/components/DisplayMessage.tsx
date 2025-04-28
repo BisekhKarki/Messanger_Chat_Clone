@@ -18,7 +18,7 @@ import ImageInput from "./ImageInput";
 import { BsSendPlusFill } from "react-icons/bs";
 
 const DisplayMessage = () => {
-  const { showInfo, token } = useCustomContext();
+  const { showInfo, token, setChangeMessage } = useCustomContext();
   const params = useParams();
   const [user, setUser] = useState<User | null>(null);
   const [userMessage, setUserMessage] = useState<string>("");
@@ -58,19 +58,28 @@ const DisplayMessage = () => {
       return;
     }
 
-    const data = {
-      conversationId: params.id,
-      senderId: senderId?._id,
-      receiverId: user?._id,
-      message: userMessage,
-      createdAt: date,
-      updatedAt: date,
-      read: false,
-    };
+    try {
+      setChangeMessage(true);
 
-    // Emit message via socket
-    socket.emit("send_message", data);
-    setUserMessage(""); // Clear the input field
+      const data = {
+        conversationId: params.id,
+        senderId: senderId?._id,
+        receiverId: user?._id,
+        message: userMessage,
+        createdAt: date,
+        updatedAt: date,
+        read: false,
+      };
+
+      // Emit message via socket
+      socket.emit("send_message", data);
+
+      // Add slight delay to ensure message persistence
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    } finally {
+      setChangeMessage(false);
+      setUserMessage("");
+    }
   };
 
   // Listen for incoming messages
@@ -113,6 +122,8 @@ const DisplayMessage = () => {
     }
   };
 
+  // console.log(senderId);
+
   return (
     <div className="w-full">
       <div className="flex w-full relative ">
@@ -125,10 +136,12 @@ const DisplayMessage = () => {
         >
           <UserMessageDisplay
             userDetails={user}
+
             // senderId={senderId?._id as string}
           />
           <div className="overflow-y-auto">
             <ShowConversations
+              senderId={senderId?._id as string}
               setUserMessage={setUserMessage}
               messages={messages}
               receiverId={user?._id as string}

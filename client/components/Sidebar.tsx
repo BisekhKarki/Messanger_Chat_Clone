@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 // import { IoIosSearch } from "react-icons/io";
-import { PiDotsThreeOutline } from "react-icons/pi";
 import AllUser from "./AllUser";
 import { FiMenu, FiX } from "react-icons/fi";
 
@@ -35,7 +34,6 @@ const Sidebar = () => {
         <div className="hidden md:block border-b border-gray-300 pb-2 sticky top-0 z-10 bg-white shadow">
           <div className="flex items-center justify-between px-5 py-2">
             <h1 className="font-bold text-2xl">Chats</h1>
-            <PiDotsThreeOutline className="bg-gray-200 txt-t-black rounded-full px-1 text-2xl hover:bg-gray-300 cursor-pointer transition" />
           </div>
           <div className="flex justify-center mt-2">
             <div className="relativ w-full max-w-xs">

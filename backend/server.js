@@ -9,6 +9,7 @@ const conversation = require("./router/ConversationRouter");
 const messageRouter = require("./router/MessageRouter");
 const imageRouter = require("./router/ImageRouter");
 const messageSchema = require("./Schema/Message");
+const conversationSchema = require("./Schema/Conversation");
 const dotenv = require("dotenv");
 dotenv.config();
 // const fs = require("fs");
@@ -82,14 +83,14 @@ io.on("connection", (so) => {
   });
 
   so.on("message_read", async (messageId) => {
-    const newData = await messageSchema.findByIdAndUpdate(messageId, {
-      read: true,
-    });
+    const newData = await messageSchema.findByIdAndUpdate(
+      messageId,
+      {
+        read: true,
+      },
+      { new: true }
+    );
 
     io.emit("read_message", newData);
   });
-
-  // so.on("disconnect", () => {
-  //   console.log("user disconnected", so.id);
-  // });
 });

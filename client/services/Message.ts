@@ -1,5 +1,6 @@
 import { baseUrl } from "@/constants/baseurl";
 import {
+  messageApi,
   // MessageGetProps,
   MessageProps,
   userapi,
@@ -96,6 +97,25 @@ export const editMessage = async (
     });
     const value = await response.json();
     return value as userapi;
+  } catch (error: unknown) {
+    console.log(String(error));
+  }
+};
+
+export const lastMessage = async (token: string, id: string) => {
+  try {
+    const response = await fetch(`${baseUrl}api/message/last`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        otherUser: id,
+      }),
+    });
+    const value = await response.json();
+    return value as messageApi;
   } catch (error: unknown) {
     console.log(String(error));
   }

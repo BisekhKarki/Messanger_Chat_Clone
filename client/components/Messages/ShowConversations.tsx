@@ -17,6 +17,7 @@ interface Props {
   setUserMessage: (value: string) => void;
   setEditMessageId: (value: string) => void;
   setEdit: (value: boolean) => void;
+  senderId: string;
 }
 
 const ShowConversations: React.FC<Props> = ({
@@ -26,6 +27,7 @@ const ShowConversations: React.FC<Props> = ({
   setUserMessage,
   setEditMessageId,
   setEdit,
+  senderId,
 }) => {
   const [lastMessage, setLastMessage] = useState<MessageProps | null>(null);
   const [showFullImage, setShowFullImage] = useState<boolean>(false);
@@ -33,7 +35,8 @@ const ShowConversations: React.FC<Props> = ({
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [messageId, setMessageId] = useState<string>("");
   const [showMenu, setShowMenu] = useState<boolean>(false);
-
+  // console.log(messages.at(-1));
+  // console.log(receiverId);
   useEffect(() => {
     setLastMessage(messages.at(-1) || null);
   }, [messages]);
@@ -43,7 +46,7 @@ const ShowConversations: React.FC<Props> = ({
       if (
         lastMessage &&
         !lastMessage.read &&
-        lastMessage?.receiverId === receiverId
+        lastMessage?.receiverId === senderId
       )
         socket.emit("message_read", lastMessage._id);
       socket.on("read_message", (data) => {
